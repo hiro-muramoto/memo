@@ -1,2 +1,2 @@
-# memo_android
+# memo
 Androidアプリメモ帳
