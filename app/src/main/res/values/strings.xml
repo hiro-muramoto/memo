@@ -2,6 +2,7 @@
     <string name="app_name">memo</string>
     <string name="save">保存</string>
     <string name="back">戻る</string>
+    <string name="baseball_news">プロ野球ニュース一覧</string>
     <string name="input_memo">メモ入力</string>
     <string name="confirmation">保存確認</string>
     <string name="yes">はい</string>

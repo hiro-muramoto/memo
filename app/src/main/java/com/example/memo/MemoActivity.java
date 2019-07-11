@@ -9,20 +9,26 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
-public class MemoActivity extends AppCompatActivity {
+public class MemoActivity extends AppCompatActivity implements View.OnClickListener {
     // Loggerのタグ
-    private static final String TAG = "hogehoge";
+    private static final String TAG = "memo_appli";
 
     private SharedPreferences mPrefs;
 
     // パラメータで受け取った日付
     private long mDate = 0;
+
+    private Button baseball_news;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +45,9 @@ public class MemoActivity extends AppCompatActivity {
             }
         }
 
+        baseball_news = (Button) findViewById(R.id.baseball_news);
+        baseball_news.setOnClickListener(this);
+
         // SharedPreferencesから"content"の値を取得する
         String content = mPrefs.getString(getKey(mDate), "");
 
@@ -53,6 +62,17 @@ public class MemoActivity extends AppCompatActivity {
 
         textSubject.setText(date);
         textContent.setText(content);
+    }
+
+    //ボタンが押された時の処理
+    public void onClick(View view){
+        //ここに遷移するための処理を追加する
+        // MainActivityを呼び出すIntentを生成
+
+        if (view == baseball_news ) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 
     /***
