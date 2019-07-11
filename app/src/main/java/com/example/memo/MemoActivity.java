@@ -11,13 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class MemoActivity extends AppCompatActivity implements View.OnClickListener {
     // Loggerのタグ
@@ -70,7 +64,7 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
         // MainActivityを呼び出すIntentを生成
 
         if (view == baseball_news ) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, BaseballRssActivity.class);
             startActivity(intent);
         }
     }

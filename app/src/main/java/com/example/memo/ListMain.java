@@ -36,7 +36,7 @@ public class ListMain extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.listmain);
+        setContentView(R.layout.list_main);
 
         // 日付の一覧を元にArrayAdapterを生成する
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,

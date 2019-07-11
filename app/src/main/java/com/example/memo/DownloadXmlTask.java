@@ -15,13 +15,13 @@ import java.util.List;
 // XMLフィードをダウンロードするために使用されるAsyncTaskの実装。
 public class DownloadXmlTask extends AsyncTask<String, Void, String> {
 
-    private MainActivity mainActivity;
+    private BaseballRssActivity baseballActivity;
 
     private static final String TAG = "RSSread";
 
-    public DownloadXmlTask(MainActivity activity) {
+    public DownloadXmlTask(BaseballRssActivity activity) {
         // 呼び出し元のアクティビティ
-        this.mainActivity = activity;
+        this.baseballActivity = activity;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
         Log.d(TAG, result);
 
         // WebViewを介してUIにHTML文字列を表示。
-        WebView myWebView = (WebView) mainActivity.findViewById(R.id.webview);
+        WebView myWebView = (WebView) baseballActivity.findViewById(R.id.webview);
         myWebView.loadData(result, "text/html", null);
     }
 
