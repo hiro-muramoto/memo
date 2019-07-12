@@ -16,7 +16,6 @@ import java.util.List;
 public class DownloadXmlTask extends AsyncTask<String, Void, String> {
 
     private BaseballRssActivity baseballActivity;
-
     private static final String TAG = "RSSread";
 
     public DownloadXmlTask(BaseballRssActivity activity) {
@@ -43,7 +42,11 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
         // WebViewを介してUIにHTML文字列を表示。
         WebView myWebView = (WebView) baseballActivity.findViewById(R.id.webview);
         myWebView.loadData(result, "text/html", null);
+
+        baseballActivity.onTaskFinished();
     }
+
+
 
     // XMLを解析し、それをHTMLマークアップと組み合わせる。
     // HTML文字列を返す。
