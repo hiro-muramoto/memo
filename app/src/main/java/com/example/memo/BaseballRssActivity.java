@@ -17,14 +17,19 @@ public class BaseballRssActivity extends AppCompatActivity {
         loadPage();
     }
 
+    // AsyncTaskを使用してURLからXMLフィードをダウンロード。
+    public void loadPage() {
+        new DownloadXmlTask(this).execute(URL);
+    }
+
     public void onTaskFinished() {
         Log.d("taskfinished", "タスク終了");
         Toast.makeText(this, "通信に成功しました", Toast.LENGTH_LONG).show();
     }
 
-    // AsyncTaskを使用してURLからXMLフィードをダウンロード。
-    public void loadPage() {
-        new DownloadXmlTask(this).execute(URL);
+    public void onTaskCancelled() {
+        Log.d("taskcancelled", "通信失敗");
+        Toast.makeText(this, "通信に失敗しました", Toast.LENGTH_LONG).show();
     }
 
 }
