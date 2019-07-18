@@ -1,35 +1,35 @@
 package com.example.memo;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 public class BaseballRssActivity extends AppCompatActivity {
 
-    private static final String URL = "https://www.nikkansports.com/baseball/professional/atom.xml";
+    private static final String TAG = "RSSread";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.baseball_rss);
 
-        loadPage();
+        Intent i = getIntent();
+        String result = i.getStringExtra("RSS");
+        displayRss(result);
     }
 
-    // AsyncTaskを使用してURLからXMLフィードをダウンロード。
-    public void loadPage() {
-        new DownloadXmlTask(this).execute(URL);
+    public void displayRss(String result) {
+        // バックグランド処理の結果を受け取る
+
+        // WebViewを介してUIにHTML文字列を表示。
+        WebView myWebView = (WebView) this.findViewById(R.id.webview);
+        myWebView.loadData(result, "text/html", null);
+
     }
 
-    public void onTaskFinished() {
-        Log.d("taskfinished", "タスク終了");
-        Toast.makeText(this, "通信に成功しました", Toast.LENGTH_LONG).show();
-    }
-
-    public void onTaskCancelled() {
-        Log.d("taskcancelled", "通信失敗");
-        Toast.makeText(this, "通信に失敗しました", Toast.LENGTH_LONG).show();
-    }
 
 }

@@ -1,6 +1,7 @@
 package com.example.memo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.webkit.WebView;
@@ -18,49 +19,60 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
 
     private BaseballRssActivity baseballActivity;
     private static final String TAG = "RSSread";
-    private ProgressDialog myProgressDialog;
-    private DownloadXmlTaskCallbacks callback;
 
-    public DownloadXmlTask(BaseballRssActivity activity) {
-        // 呼び出し元のアクティビティ
-        this.baseballActivity = activity;
+    private DownloadXmlTaskCallback myCallback;
+
+    public interface DownloadXmlTaskCallback {
+
+        // ボタンタップしたときのグルグルを表示
+        public void onStartBackgroundTask();
+
+        // タスクが正常に終了
+        public void onEndBackgroundTask(String result);
+
+        // 通信に失敗
+        public void onCancelledTask();
     }
 
-    @Override
-    protected void onPreExecute() {
-        //ダイアログを表示させるなどのUIの準備
-        myProgressDialog = new ProgressDialog(baseballActivity);
-        myProgressDialog.setMessage("通信中です");
-        myProgressDialog.show();
+//    public DownloadXmlTask(BaseballRssActivity activity) {
+//        // 呼び出し元のアクティビティ
+//        this.baseballActivity = activity;
+//    }
+
+    // コンストラクタ
+    public DownloadXmlTask(DownloadXmlTaskCallback callback) {
+        myCallback = callback;
     }
+
 
     @Override
     protected String doInBackground(String... urls) {
         try {
             return loadXmlFromNetwork(urls[0]);
         } catch (IOException e) {
-            return "IOException発生";
+            Log.d(TAG, "IOException発生");
+            return "error";
         } catch (XmlPullParserException e) {
-            return "XmlPullParserException発生";
+            Log.d(TAG, "XmlPullParserException発生");
+            return "error";
         }
     }
 
     @Override
+    protected void onPreExecute() {
+        myCallback.onStartBackgroundTask();
+    }
+
+    @Override
     protected void onPostExecute(String result) {
-        myProgressDialog.dismiss();
-        Log.d(TAG, result);
-
-        // WebViewを介してUIにHTML文字列を表示。
-        WebView myWebView = (WebView) baseballActivity.findViewById(R.id.webview);
-        myWebView.loadData(result, "text/html", null);
-
-        baseballActivity.onTaskFinished();
+        // タスクが終了したことをUIスレッドに通知
+        myCallback.onEndBackgroundTask(result);
     }
 
     @Override
     protected void onCancelled() {
-        myProgressDialog.dismiss();
-        baseballActivity.onTaskCancelled();
+        // UIスレッドに通知
+        myCallback.onCancelledTask();
     }
 
     // XMLを解析し、それをHTMLマークアップと組み合わせる。

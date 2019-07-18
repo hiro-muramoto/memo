@@ -1,5 +1,7 @@
 package com.example.memo;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,13 +11,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MemoActivity extends AppCompatActivity implements View.OnClickListener {
     // Loggerのタグ
     private static final String TAG = "memo_appli";
+    private static final String URL = "https://www.nikkansports.com/baseball/professional/atom.xml";
 
     private SharedPreferences mPrefs;
 
@@ -23,6 +28,11 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
     private long mDate = 0;
 
     private Button baseball_news;
+
+    private DownloadXmlTask downloadXmlTask;
+    private ProgressDialog myProgressDialog;
+
+    private BaseballRssActivity baseballActivity;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +55,6 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
         // SharedPreferencesから"content"の値を取得する
         String content = mPrefs.getString(getKey(mDate), "");
 
-        // カレンダーを取得
-        // Calendar cal = Calendar.getInstance();
 
         // 今日の日付を文字列に変換する
         String date = Defines.sFmt.format(mDate);
@@ -56,17 +64,93 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
 
         textSubject.setText(date);
         textContent.setText(content);
+
+        //ダイアログを表示させるなどのUIの準備
+        myProgressDialog = new ProgressDialog(this);
+
     }
 
     //ボタンが押された時の処理
     public void onClick(View view){
-        //ここに遷移するための処理を追加する
         // MainActivityを呼び出すIntentを生成
-
         if (view == baseball_news ) {
-            Intent intent = new Intent(this, BaseballRssActivity.class);
-            startActivity(intent);
+            //ここに遷移するための処理を追加する
+            downloadXmlTask = new DownloadXmlTask(myCallback);
+            downloadXmlTask.execute(URL);
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (!downloadXmlTask.isCancelled()) {
+            // タスクのキャンセル
+            downloadXmlTask.cancel(true);
+        }
+    }
+
+    private DownloadXmlTask.DownloadXmlTaskCallback myCallback = new DownloadXmlTask.DownloadXmlTaskCallback() {
+
+        /**
+         * プログレスダイアログのキャンセルリスナー
+         * @note バックキー押下でダイアログを消すと呼ばれる
+         * */
+        private DialogInterface.OnCancelListener myOnCancelListener = new DialogInterface.OnCancelListener() {
+
+            public void onCancel(DialogInterface dialogInterface) {
+                // タスクのキャンセル
+                downloadXmlTask.cancel(true);
+            }
+
+        };
+
+        public void onStartBackgroundTask() {
+            myProgressDialog.setMessage("通信中です");
+            myProgressDialog.show();
+
+            // キャンセルリスナーの登録
+            myProgressDialog.setOnCancelListener(myOnCancelListener);
+
+        }
+
+        public void onEndBackgroundTask(String result) {
+
+            // バックグランド処理の結果を受け取る
+            myProgressDialog.dismiss();
+            Log.d(TAG, result);
+
+            if (result == "error") {
+                onTaskFailed();
+            } else {
+                onTaskFinished();
+
+                Intent intent = new Intent(getApplicationContext(), BaseballRssActivity.class);
+                intent.putExtra("RSS", result);
+                startActivity(intent);
+            }
+
+
+
+        }
+
+        public void onCancelledTask() {
+            // キャンセル処理
+            if (myProgressDialog.isShowing()) {
+                myProgressDialog.dismiss();
+            }
+        }
+
+    };
+
+    public void onTaskFinished() {
+        Log.d("taskfinished", "タスク終了");
+        Toast.makeText(this, "通信に成功しました", Toast.LENGTH_LONG).show();
+    }
+
+    public void onTaskFailed() {
+        Log.d("taskfailed", "タスク終了");
+        Toast.makeText(this, "通信に失敗しました", Toast.LENGTH_LONG).show();
     }
 
     /***
