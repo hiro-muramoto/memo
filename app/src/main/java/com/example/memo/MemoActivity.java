@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MemoActivity extends AppCompatActivity implements View.OnClickListener {
+public class MemoActivity extends AppCompatActivity implements View.OnClickListener, DownloadXmlTask.DownloadXmlTaskCallback {
     // Loggerのタグ
     private static final String TAG = "memo_appli";
     private static final String URL = "https://www.nikkansports.com/baseball/professional/atom.xml";
@@ -71,7 +72,7 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
         // MainActivityを呼び出すIntentを生成
         if (view == baseball_news ) {
             //ここに遷移するための処理を追加する
-            downloadXmlTask = new DownloadXmlTask(myCallback);
+            downloadXmlTask = new DownloadXmlTask(this);
             downloadXmlTask.execute(URL);
         }
     }
@@ -86,54 +87,15 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private DownloadXmlTask.DownloadXmlTaskCallback myCallback = new DownloadXmlTask.DownloadXmlTaskCallback() {
+    /**
+     * プログレスダイアログのキャンセルリスナー
+     * バックキー押下でダイアログを消すと呼ばれる
+     * */
+    private DialogInterface.OnCancelListener myOnCancelListener = new DialogInterface.OnCancelListener() {
 
-        /**
-         * プログレスダイアログのキャンセルリスナー
-         * バックキー押下でダイアログを消すと呼ばれる
-         * */
-        private DialogInterface.OnCancelListener myOnCancelListener = new DialogInterface.OnCancelListener() {
-
-            public void onCancel(DialogInterface dialogInterface) {
-                // タスクのキャンセル
-                downloadXmlTask.cancel(true);
-            }
-
-        };
-
-        public void onStartBackgroundTask() {
-            myProgressDialog.setMessage("通信中です");
-
-            // キャンセルリスナーの登録
-            myProgressDialog.setOnCancelListener(myOnCancelListener);
-
-            myProgressDialog.show();
-
-        }
-
-        public void onEndBackgroundTask(String result) {
-
-            // バックグラウンド処理の結果を受け取る
-            myProgressDialog.dismiss();
-            Log.d(TAG, result);
-
-            if (result.isEmpty()) {
-                onTaskFailed();
-            } else {
-                onTaskFinished();
-
-                Intent intent = new Intent(getApplicationContext(), BaseballRssActivity.class);
-                intent.putExtra("RSS", result);
-                startActivity(intent);
-            }
-
-        }
-
-        public void onCancelledTask() {
-            // キャンセル処理
-            if (myProgressDialog.isShowing()) {
-                myProgressDialog.dismiss();
-            }
+        public void onCancel(DialogInterface dialogInterface) {
+            // タスクのキャンセル
+            downloadXmlTask.cancel(true);
         }
 
     };
@@ -204,6 +166,44 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
             }
             break;
+        }
+    }
+
+    @Override
+    public void onStartBackgroundTask() {
+        myProgressDialog.setMessage("通信中です");
+
+        // キャンセルリスナーの登録
+        myProgressDialog.setOnCancelListener(myOnCancelListener);
+
+        myProgressDialog.show();
+
+
+    }
+
+    @Override
+    public void onEndBackgroundTask(String result) {
+        // バックグラウンド処理の結果を受け取る
+        myProgressDialog.dismiss();
+        Log.d(TAG, result);
+
+        if (result.isEmpty()) {
+            onTaskFailed();
+        } else {
+            onTaskFinished();
+
+            Intent intent = new Intent(getApplicationContext(), BaseballRssActivity.class);
+            intent.putExtra("RSS", result);
+            startActivity(intent);
+        }
+
+    }
+
+    @Override
+    public void onCancelledTask() {
+        // キャンセル処理
+        if (myProgressDialog.isShowing()) {
+            myProgressDialog.dismiss();
         }
     }
 }

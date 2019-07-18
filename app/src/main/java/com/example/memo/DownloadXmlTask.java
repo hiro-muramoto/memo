@@ -1,6 +1,7 @@
 package com.example.memo;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -57,6 +58,7 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        Log.d("hoge", "onPostExecute");
         // タスクが終了したことをUIスレッドに通知
         myCallback.onEndBackgroundTask(result);
     }
@@ -81,6 +83,7 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
         String published = null;
 
         StringBuilder htmlString = new StringBuilder();
+        Log.d("hoge", "取得前");
 
         try {
             stream = downloadUrl(urlString);
@@ -91,6 +94,8 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
                 stream.close();
             }
         }
+
+        Log.d("hoge", "取得後");
 
         // RssXmlParserは、EntryオブジェクトのList(entries)を返す。
         // 各EntryオブジェクトはXMLフィード内の単一の投稿を表す。
