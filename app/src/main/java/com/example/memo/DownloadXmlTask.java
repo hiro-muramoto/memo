@@ -1,7 +1,6 @@
 package com.example.memo;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParserException;
 
