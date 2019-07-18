@@ -1,12 +1,9 @@
 package com.example.memo;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 public class BaseballRssActivity extends AppCompatActivity {
 
@@ -23,8 +20,6 @@ public class BaseballRssActivity extends AppCompatActivity {
     }
 
     public void displayRss(String result) {
-        // バックグランド処理の結果を受け取る
-
         // WebViewを介してUIにHTML文字列を表示。
         WebView myWebView = (WebView) this.findViewById(R.id.webview);
         myWebView.loadData(result, "text/html", null);

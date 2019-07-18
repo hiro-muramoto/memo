@@ -1,10 +1,7 @@
 package com.example.memo;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.webkit.WebView;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -17,8 +14,8 @@ import java.util.List;
 // XMLフィードをダウンロードするために使用されるAsyncTaskの実装。
 public class DownloadXmlTask extends AsyncTask<String, Void, String> {
 
-    private BaseballRssActivity baseballActivity;
     private static final String TAG = "RSSread";
+    private String RssResult = "";
 
     private DownloadXmlTaskCallback myCallback;
 
@@ -27,17 +24,12 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
         // ボタンタップしたときのグルグルを表示
         public void onStartBackgroundTask();
 
-        // タスクが正常に終了
+        // タスクが正常に終了(通信成功、失敗も含む)
         public void onEndBackgroundTask(String result);
 
-        // 通信に失敗
+        // 通信をキャンセル
         public void onCancelledTask();
     }
-
-//    public DownloadXmlTask(BaseballRssActivity activity) {
-//        // 呼び出し元のアクティビティ
-//        this.baseballActivity = activity;
-//    }
 
     // コンストラクタ
     public DownloadXmlTask(DownloadXmlTaskCallback callback) {
@@ -47,15 +39,16 @@ public class DownloadXmlTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... urls) {
+
         try {
-            return loadXmlFromNetwork(urls[0]);
+            RssResult = loadXmlFromNetwork(urls[0]);
         } catch (IOException e) {
-            Log.d(TAG, "IOException発生");
-            return "error";
+            e.printStackTrace();
         } catch (XmlPullParserException e) {
-            Log.d(TAG, "XmlPullParserException発生");
-            return "error";
+            e.printStackTrace();
         }
+
+        return RssResult;
     }
 
     @Override

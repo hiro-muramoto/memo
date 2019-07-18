@@ -32,8 +32,6 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
     private DownloadXmlTask downloadXmlTask;
     private ProgressDialog myProgressDialog;
 
-    private BaseballRssActivity baseballActivity;
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit);
@@ -94,7 +92,7 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
 
         /**
          * プログレスダイアログのキャンセルリスナー
-         * @note バックキー押下でダイアログを消すと呼ばれる
+         * バックキー押下でダイアログを消すと呼ばれる
          * */
         private DialogInterface.OnCancelListener myOnCancelListener = new DialogInterface.OnCancelListener() {
 
@@ -107,20 +105,21 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
 
         public void onStartBackgroundTask() {
             myProgressDialog.setMessage("通信中です");
-            myProgressDialog.show();
 
             // キャンセルリスナーの登録
             myProgressDialog.setOnCancelListener(myOnCancelListener);
+
+            myProgressDialog.show();
 
         }
 
         public void onEndBackgroundTask(String result) {
 
-            // バックグランド処理の結果を受け取る
+            // バックグラウンド処理の結果を受け取る
             myProgressDialog.dismiss();
             Log.d(TAG, result);
 
-            if (result == "error") {
+            if (result.isEmpty()) {
                 onTaskFailed();
             } else {
                 onTaskFinished();
@@ -129,8 +128,6 @@ public class MemoActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("RSS", result);
                 startActivity(intent);
             }
-
-
 
         }
 
